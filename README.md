@@ -21,39 +21,39 @@ yarn add typescript
 Todos os projetos em TypeScript, diferente do JavaScript, recebem a extensão `.ts`.
 
 ```ts
-function greeter(person) {
-   console.log("Hello, " + person)
+function person(name) {
+   console.log(`Hello ${name}`)
 }
-greeter("Carlos")
+person("Carlos")
 ```
 
-No exemplo acima, a função `greeter` recebia um parâmetro chamado `person`. Ao chamar essa função, o parâmetro passado foi uma variável que recebia uma string, formando assim em seu console.log `"Hello Carlos"`.
+No exemplo acima, a função `person` recebia um parâmetro chamado `name`. Ao chamar essa função, o parâmetro passado foi uma variável que recebia uma string, formando assim em seu console.log `"Hello Carlos"`.
 
 ## Compilando o código
 
 Para que possamos utilizar o TypeScript, precisaríamos compilar o arquivo. Poderiamos, simplesmente, copiar/colar o código TS em um arquivo JS, porém, não é recomendando, visto que há a possibilidade de termos muitos arquivos no projeto para conversão. Para isso, podemos compilar pelo terminal da seguinte forma:
 
-`tsc greeter.ts`
+`tsc person.ts`
 
-O resultado será um arquivo `greeter.js` que contém o mesmo código escrito do arquivo `greeter.ts`.
+O resultado será um arquivo `person.js` que contém o mesmo código escrito do arquivo `person.ts`.
 
 ## Definindo o tipo
 
 A definição de tipos é uma forma de registrar o que é esperado pela função ou variável. Nesse caso, esperamos que a função seja chamado com um parâmetro do tipo `string`. Podemos, ao passar o parâmetro, alterar o seu tipo, mas o TypeScript interpreta que não é uma string e retornará um erro.
 
 ```ts
-function greeter(person: string) {
-   console.log("Hello, " + person)
+function person(name: string) {
+   console.log(`Hello ${name}`)
 }
-greeter("Carlos")
+person("Carlos")
 ```
 
 ```ts
 // passando outro tipo de variável
-function greeter(person: string) {
-   console.log("Hello, " + person)
+function person(name: string) {
+   console.log(`Hello ${name}`)
 }
-greeter([1, 2, 3])
+person([1, 2, 3])
 ```
 `Argument of type 'number[]' is not assignable to parameter of type 'string'.`
 
@@ -100,7 +100,9 @@ E, ao passar os parâmetros para a função:
 ```ts
 import { Request, Response } from 'express'
 
-[...]
+const user = [
+   { name: "Carlos", email: "carlos@email.com" }
+]
 
 export default {
    async index(req: Request, res: Response) {
@@ -119,7 +121,7 @@ const x: number = 3
 const arr: number[] = [1, 2, 3]
 ```
 
-Para tipar os parâmetros de uma função, informamos logo após a sua declaração e para a função, logo após fechar os parênteses dos parâmetros.
+Para tipar os parâmetros de uma função, informamos logo após a sua declaração e para a função, logo após fechar os parênteses dos parâmetros. Também é possível tipar o retorno de uma função. No exemplo abaixo, definimos que o retorno da função é uma string.
 
 ```ts
 function compare (a: number, b: number): string {
@@ -129,30 +131,30 @@ function compare (a: number, b: number): string {
 
 ## Interfaces
 
-A *interface* descreve um objeto que receberá diversos campos. Podemos reutilizá-lo em todo o projeto. No TypeScript, dois tipos são compatíveis se a estrutura interna for compatível. Isso permite implementar uma interface apenas com o formato que ela exige.
+A *interface* descreve um objeto que receberá diversas propriedades. Podemos reutilizá-lo em todo o projeto. No TypeScript, dois tipos são compatíveis se a estrutura interna for compatível. Isso permite implementar uma interface apenas com o formato que ela exige.
 
 ```ts
 interface IPerson {
    firstName: string
    lastName: string
 }
-function greeter(person: IPerson) {
-   console.log("Hello, " + person.firstName + " " + person.lastName)
+function person(name: IPerson) {
+   console.log(`Hello ${name.firstName} ${name.lastName}`)
 }
-greeter({ firstName: "Carlos", lastName:"Faustino" })
+person({ firstName: "Carlos", lastName: "Faustino" })
 ```
 
-Também podemos desestruturar uma interface ao passá-la para função
+Também podemos desestruturar uma interface ao passá-la para função.
 
 ```ts
 interface IPerson {
    firstName: string
    lastName: string
 }
-function greeter({ firstName, lastName }: IPerson) {
-   console.log("Hello, " + firstName + " " + lastName)
+function person({ firstName, lastName }: IPerson) {
+   console.log(`Hello ${firstName} ${lastName}`)
 }
-greeter("Carlos", "Faustino")
+person("Carlos", "Faustino")
 ```
 
 Para definir que algum campo não seja obrigatório, podemos passar a interface o ponto de interrogação (?) da seguinte forma:
@@ -260,11 +262,11 @@ export default {
 
 Uma boa prática para as interfaces é nomeá-las com a letra *I* a frente: `IMailTo`.
 
-### React.FC
+## React.FC
 
 No React, quando passamos *props* em um componente funcional, precisamos declarar uma interface para ele. O problema é que, ao declarar um interface e passá-la ao componente, estaríamos retirando uma propriedade importante que o componente recebe, o *children*.<br>
 
-```ts
+```tsx
 import React from 'react'
 
 interface IUser {
@@ -276,9 +278,10 @@ interface IUser {
 
 const User = ({ user }: IUser) => {
    return (
-      <>
-         [...]
-      </>
+      <div>
+         <p>Meu nome é {user.name}</p>
+         <p>Meu e-mail é {user.email}</p>
+      </div>
    )
 }
 
@@ -289,7 +292,7 @@ Neste caso acima, o componente recebe uma propriedade: **user**. Ela foi passada
 
 Podemos utilizar uma tipagem do React chamada *React.FC*. Ela recebe um parâmetro que são as props e, neste caso, podemos passar a interface para ele.
 
-```ts
+```tsx
 import React from 'react'
 
 interface IUser {
@@ -299,11 +302,16 @@ interface IUser {
    }
 }
 
-const User: React.FC<IUser> = ({ user }) => {
+const User: React.FC<IUser> = ({ user, children }) => {
    return (
-      <>
-         [...]
-      </>
+      <div>
+         <p>Meu nome é {user.name}</p>
+         <p>Meu e-mail é {user.email}</p>
+
+         <div>
+            {children}
+         </div>
+      </div>
    )
 }
 ```
@@ -320,7 +328,16 @@ type Poligono =
    { type: 'circulo', radius: number } |
    { type: 'retangulo', x: number, y: number }
 
-export function area (poligono: Poligono): number {}
+export function area (poligono: Poligono): number {
+   switch (poligono.type) {
+      case 'quadrado': 
+         return poligono.x ** 2
+      case 'circulo': 
+         return Math.PI * poligono.radius **2
+      case 'retangulo': 
+         return poligono.x * poligono.y
+   }
+}
 ```
 
 No exemplo acima, o parâmetro pode assumir três formatos baseado no tipo de figura.
@@ -339,9 +356,12 @@ type Poligono =
 
 export function area (poligono: Poligono): number {
    switch (poligono.type) {
-      case TPoligono.Quadrado: return poligono.x ** 2
-      case TPoligono.Retangulo: return poligono.x * poligono.y
-      case TPoligono.Circulo: return Math.PI * poligono.radius ** 2
+      case TPoligono.Quadrado: 
+         return poligono.x ** 2
+      case TPoligono.Circulo: 
+         return Math.PI * poligono.radius ** 2
+      case TPoligono.Retangulo: 
+         return poligono.x * poligono.y
    }
 }
 ```
